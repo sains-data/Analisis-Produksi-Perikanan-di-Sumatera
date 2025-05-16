@@ -137,9 +137,8 @@ fisheries-bigdata-sumatera/
 In Sumatera, the fisheries industry plays a vital role in economic growth and food security. A significant challenge lies in managing and analyzing vast amounts of fisheries production data across different provinces.
 
 This system integrates:
-- **BMKG**: Rainfall and climate data
+- **BMKG**: Rainfall, temperature, and humidity
 - **BPS**: Historical production data
-- **IoT Sensors**: Real-time water levels
 
 Results: 
 - Real-time insights and accurate predictive analytics assist in informed decision-making for fisheries management.
