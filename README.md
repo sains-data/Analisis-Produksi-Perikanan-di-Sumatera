@@ -4,10 +4,10 @@
 This project demonstrates the use of Hadoop’s ecosystem, specifically Apache Spark, for analyzing fisheries production data from Sumatra, Indonesia. The system processes multi-source data using batch analytics to support optimal decision-making and policy formulation.
 
 **Team Members:**  
-Dinda Joycehana (122140048)
-Elia Meylani Simanjuntak (122450026)
-Presilia (122450081)
-Randa Andriana Putra (122450083)
+- Dinda Joycehana (122140048)
+- Elia Meylani Simanjuntak (122450026)
+- Presilia (122450081)
+- Randa Andriana Putra (122450083)
 
 ---
 
