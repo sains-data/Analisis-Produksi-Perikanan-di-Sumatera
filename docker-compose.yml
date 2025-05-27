@@ -1,0 +1,196 @@
+version: '3'
+services:
+  namenode:
+    build:
+      context: .
+      dockerfile: Dockerfile.hadoop
+    container_name: namenode
+    hostname: namenode
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    volumes:
+      - ./conf:/opt/hadoop/etc/hadoop
+      - namenode_data:/hadoop/dfs/name
+    command: hdfs namenode
+    networks:
+      - hadoopnet
+
+  datanode:
+    build:
+      context: .
+      dockerfile: Dockerfile.hadoop
+    container_name: datanode
+    hostname: datanode
+    depends_on:
+      - namenode
+    ports:
+      - "9864:9864"
+    volumes:
+      - ./conf:/opt/hadoop/etc/hadoop
+      - datanode_data:/hadoop/dfs/data
+    command: hdfs datanode
+    networks:
+      - hadoopnet
+
+  resourcemanager:
+    build:
+      context: .
+      dockerfile: Dockerfile.hadoop
+    container_name: resourcemanager
+    hostname: resourcemanager
+    depends_on:
+      - namenode
+      - datanode
+    ports:
+      - "8088:8088"
+    command: yarn resourcemanager
+    networks:
+      - hadoopnet
+
+  spark-master:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
+    container_name: spark-master
+    hostname: spark-master
+    ports:
+      - "7077:7077"
+      - "8081:8080"  # Spark Master Web UI
+      - "4040:4040"  # Spark Job UI
+    volumes:
+    - .:/opt/spark/app
+    environment:
+      - SPARK_MODE=master
+    command: /bin/bash -c "/opt/spark/sbin/start-master.sh --host spark-master; tail -f /dev/null"
+    networks:
+      - hadoopnet
+
+  spark-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
+    container_name: spark-worker
+    hostname: spark-worker
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+    command: /opt/spark/sbin/start-worker.sh spark://spark-master:7077 && tail -f /dev/null
+    networks:
+      - hadoopnet
+
+  hive-metastore:
+    build:
+      context: .
+      dockerfile: Dockerfile.hive
+    container_name: hive-metastore
+    hostname: hive-metastore
+    depends_on:
+      - namenode
+    ports:
+      - "9083:9083"
+    command: /opt/hive/bin/hive --service metastore
+    volumes:
+      - hive_metastore_data:/opt/hive/metastore_db
+    networks:
+      - hadoopnet
+
+  hive-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.hive
+    container_name: hive-server
+    hostname: hive-server
+    depends_on:
+      - hive-metastore
+    ports:
+      - "10000:10000"
+    command: /opt/hive/bin/hive --service hiveserver2
+    networks:
+      - hadoopnet
+
+  hbase-master:
+    build:
+      context: .
+      dockerfile: Dockerfile.hbase
+    container_name: hbase-master
+    hostname: hbase-master
+    depends_on:
+      - namenode
+      - zookeeper
+    ports:
+      - "16010:16010"
+    command: /opt/hbase/bin/start-hbase.sh && tail -f /dev/null
+    volumes:
+      - hbase_data:/opt/hbase/data
+    networks:
+      - hadoopnet
+
+  zookeeper:
+    build:
+      context: .
+      dockerfile: Dockerfile.zookeeper
+    container_name: zookeeper
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    command: /opt/zookeeper/bin/zkServer.sh start-foreground
+    volumes:
+      - zookeeper_data:/opt/zookeeper/data
+    networks:
+      - hadoopnet
+
+  superset:
+    build:
+      context: .
+      dockerfile: Dockerfile.superset
+    container_name: superset
+    hostname: superset
+    depends_on:
+      - hive-server
+    environment:
+      - SUPERSET_SECRET_KEY=TuG4sB3sarABDKel0mp0kz24Produk21ik4nL@mpunk
+    ports:
+      - "8089:8088"
+    volumes:
+    - ./superset-init.sh:/app/superset-init.sh
+    command: >
+      /bin/bash -c "
+      superset db upgrade &&
+      superset fab create-admin --username admin --firstname Superset --lastname Admin --email admin@superset.com --password admin123 &&
+      superset init &&
+      gunicorn --bind 0.0.0.0:8088 --workers 1 --worker-class gthread --threads 4 --timeout 60 'superset.app:create_app()'
+      "
+    networks:
+      - hadoopnet
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: airflow
+    hostname: airflow
+    depends_on:
+      - spark-master
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+    ports:
+      - "8080:8080"
+    command: webserver
+    volumes:
+      - airflow_data:/opt/airflow
+    networks:
+      - hadoopnet
+
+networks:
+  hadoopnet:
+
+volumes:
+  namenode_data:
+  datanode_data:
+  hive_metastore_data:
+  hbase_data:
+  zookeeper_data:
+  airflow_data:
