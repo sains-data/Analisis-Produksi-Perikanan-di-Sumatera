@@ -1,0 +1,15 @@
+FROM ubuntu:24.04
+# Install Java and tools
+RUN apt-get update && apt-get install -y openjdk-8-jdk ssh rsync wget nano vim
+
+# Set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+RUN apt-get update && apt-get install -y openjdk-8-jdk mysql-client wget
+COPY apache-hive-4.0.1-bin.tar.gz /apache-hive-4.0.1-bin.tar.gz
+RUN tar -xvzf apache-hive-4.0.1-bin.tar.gz -C /opt \
+    && ln -sf /opt/apache-hive-4.0.1-bin /opt/hive
+COPY mysql-connector-java-8.0.28.jar /opt/hive/lib/
+ENV HIVE_HOME=/opt/hive
+ENV PATH=$PATH:$HIVE_HOME/bin

@@ -1,0 +1,15 @@
+FROM ubuntu:24.04
+# Install Java and tools
+RUN apt-get update && apt-get install -y openjdk-8-jdk ssh rsync wget nano vim
+
+# Set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+RUN apt-get update && apt-get install -y openjdk-8-jdk wget
+COPY apache-zookeeper-3.8.4-bin.tar.gz /apache-zookeeper-3.8.4-bin.tar.gz
+RUN tar -xvzf apache-zookeeper-3.8.4-bin.tar.gz -C /opt \
+    && ln -s /opt/apache-zookeeper-3.8.4-bin /opt/zookeeper
+COPY zoo.cfg /opt/zookeeper/conf/zoo.cfg
+ENV ZOOKEEPER_HOME=/opt/zookeeper
+ENV PATH=$PATH:$ZOOKEEPER_HOME/bin:$ZOOKEEPER_HOME/sbin

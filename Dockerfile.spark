@@ -1,0 +1,17 @@
+FROM ubuntu:24.04
+# Install Java and tools
+RUN apt-get update && apt-get install -y openjdk-8-jdk ssh rsync wget nano vim
+
+# Set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Install Spark
+COPY spark-3.5.5-bin-hadoop3.tgz /spark-3.5.5-bin-hadoop3.tgz
+RUN tar -xvzf spark-3.5.5-bin-hadoop3.tgz -C /opt \
+    && ln -sf /opt/spark-3.5.5-bin-hadoop3 /opt/spark
+
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+
+CMD ["/bin/bash"]
