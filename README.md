@@ -4,6 +4,7 @@
 This project builds a Big Data analytics system to analyze fishery production trends in **Lampung Province, Indonesia**, over a 5-year period (2019–2023). The system adopts a **Medallion Architecture (Bronze–Silver–Gold)** with processing built on top of the **Apache Hadoop ecosystem**, combined with **machine learning** (K-Means & Linear Regression) and **interactive visualization dashboards**.
 
 ## 📦 System Architecture
+![Produksi_ikan_tangkap_laut csv](https://github.com/user-attachments/assets/d3bfe7e1-0376-43e5-b934-58bcc5594514)
 
 - 🔹 **Bronze Layer**: Stores raw data (CSV, SHP) from KKP, BMKG, and BIG.
 - 🔸 **Silver Layer**: Performs data cleaning and normalization using Apache Spark.
@@ -31,8 +32,6 @@ This project builds a Big Data analytics system to analyze fishery production tr
 - 🔄 Monitor and automate pipelines with Apache Airflow
 
 ## 🗂️ Project Structure
-
-![Produksi_ikan_tangkap_laut csv](https://github.com/user-attachments/assets/d3bfe7e1-0376-43e5-b934-58bcc5594514)
 
 
 ```
