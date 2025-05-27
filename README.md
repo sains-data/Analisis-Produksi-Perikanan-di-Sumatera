@@ -32,7 +32,8 @@ This project builds a Big Data analytics system to analyze fishery production tr
 
 ## 🗂️ Project Structure
 
-![alt text](Produksi_ikan_tangkap_laut.csv.png)
+![Produksi_ikan_tangkap_laut csv](https://github.com/user-attachments/assets/d3bfe7e1-0376-43e5-b934-58bcc5594514)
+
 
 ```
 
@@ -192,4 +193,6 @@ The project involves:
 - Randa Andriana Putra (122450083)
 
 ---
+Hasil Bronze
+![Screenshot 2025-05-27 012207](https://github.com/user-attachments/assets/b2688edc-aeab-4297-8a1a-a424b23be1cf)
 
