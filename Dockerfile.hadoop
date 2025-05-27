@@ -1,0 +1,28 @@
+FROM ubuntu:24.04
+
+# Hindari prompt interactive
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Java dan tools (cukup sekali)
+RUN apt-get update && \
+    apt-get install -y openjdk-8-jdk ssh rsync wget nano vim tar && \
+    apt-get clean
+
+# Set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Salin dan ekstrak Hadoop
+COPY hadoop-3.4.1.tar.gz /hadoop-3.4.1.tar.gz
+RUN tar -xvzf /hadoop-3.4.1.tar.gz -C /opt && \
+    ln -s /opt/hadoop-3.4.1 /opt/hadoop
+
+# Set Hadoop env
+ENV HADOOP_HOME=/opt/hadoop
+ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+# Update hadoop-env.sh with JAVA_HOME
+RUN echo "export JAVA_HOME=${JAVA_HOME}" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+
+# Buat folder untuk HDFS (namenode/datanode)
+RUN mkdir -p /hadoop/dfs/name && \
+    mkdir -p /hadoop/dfs/data
